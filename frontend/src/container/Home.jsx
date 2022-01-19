@@ -52,7 +52,7 @@ const Home = () => {
                         <img
                             src={user?.image}
                             alt="User Photo"
-                            className='w-28'
+                            className='w-28 rounded-md'
                         />
                     </Link>
                 </div>
