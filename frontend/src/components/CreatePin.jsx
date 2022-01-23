@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 
 import { client } from '../client';
+import { categories } from '../utils/data';
 import Spinner from './Spinner';
 
 const CreatePin = ({ user }) => {
@@ -17,7 +18,36 @@ const CreatePin = ({ user }) => {
     const [wrongImageType, setWrongImageType] = useState(false);
 
     const navigate = useNavigate();
-
+    const savePin = () => {
+        if (title && about && destination && imageAsset?._id && category) {
+            const doc = {
+                _type: 'pin',
+                title: title,
+                about: about,
+                destination: destination,
+                image: {
+                    _type: 'image',
+                    asset: {
+                        _type: 'reference',
+                        _ref: imageAsset?._id,
+                    }
+                },
+                userId: user._id,
+                postedBy: {
+                    _type: 'postedBy',
+                    _ref: user._id,
+                },
+                category: category,
+            }
+            client.create(doc)
+                .then(() => {
+                    navigate('/');
+                })
+        } else {
+            setFields(true);
+            setTimeout(() => setFields(false), 2000);
+        }
+    }
     const uploadImage = (e) => {
         const { type, name } = e.target.files[0];
 
@@ -59,8 +89,8 @@ const CreatePin = ({ user }) => {
                                             Click to Upload
                                         </p>
                                     </div>
-                                    <p className='mt-32 text-gray-400'>
-                                        Use high-quality JPG, SVG, PNG, GIF or TIFF type images <strong>(less than 10 megabytes)</strong>
+                                    <p className='mt-32 text-gray-400 text-center'>
+                                        Use high-quality JPG, SVG, PNG, GIF or TIFF type images <p><strong>(less than 10 megabytes)</strong></p>
                                     </p>
                                 </div>
                                 <input
@@ -84,6 +114,7 @@ const CreatePin = ({ user }) => {
                         )}
                     </div>
                 </div>
+
                 <div className='flex flex-1 flex-col gap-6 lg:pl-5 mt-5 w-full'>
                     <input
                         type="text"
@@ -91,8 +122,54 @@ const CreatePin = ({ user }) => {
                         onChange={(e) => setTitle(e.target.value)}
                         placeholder='Add your title here'
                         className='outline-none text-2xl sm:text-3xl font-bold border-b-2 border-gray-200 p-2'
-                        
                     />
+                    {user && (
+                        <div className='flex gap-2 my-2 items-center bg-white rounded-lg'>
+                            <img src={user.image} alt="user-profile" className='w-10 h-10 rounded-full' />
+                            <p className='font-bold'>{user.userName}</p>
+                        </div>
+                    )}
+
+                    <input
+                        type="text"
+                        value={about}
+                        onChange={(e) => setAbout(e.target.value)}
+                        placeholder='What is the image is about?'
+                        className='outline-none text-base sm:text-large border-b-2 border-gray-200 p-2'
+                    />
+
+                    <input
+                        type="text"
+                        value={destination}
+                        onChange={(e) => setDestination(e.target.value)}
+                        placeholder='About the source of the image (URL)'
+                        className='outline-none text-base sm:text-large border-b-2 border-gray-200 p-2'
+                    />
+                    <div className='flex flex-col'>
+                        <div>
+                            <p className='mb-2 font-semibold text-lg sm:text-xl'>
+                                Choose Pin Category
+                            </p>
+                            <select
+                                onChange={(e) => setCategory(e.target.value)}
+                                className='outline-none w-4/5 text-base border-b-2 border-gray-200 p-2 cursor-pointer rounded accent-purple-400'
+                            >
+                                <option value="others" className='bg-white'>Select Category</option>
+                                {categories.map((category) => (
+                                    <option value={category.name} className='text-base border-0 outline-none capitalize bg-white text-black'>{category.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className='flex justify-end items-end mt-5'>
+                            <button
+                                type='button'
+                                onClick={savePin}
+                                className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full hover:text-blue-100'
+                            >
+                                Save Pin
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

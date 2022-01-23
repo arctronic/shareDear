@@ -12,7 +12,6 @@ const Pin = ({ pin: { image, postedBy, _id, destination, save } }) => {
     const [PostHovered, SetPostHovered] = useState(false);
     const navigate = useNavigate();
     const user = fetchUser();
-    console.log(save)
     const alreadySaved = !!(save?.filter((item) => item.postedBy._id === user.googleId))?.length;
     // created as boolean
     const savePin = (id) => {
