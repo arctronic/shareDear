@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { MdDownloadForOffline } from 'react-icons/md'
+import { BiCommentAdd } from 'react-icons/bi'
 import { Link, useParams } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 import { client, urlfor } from '../client'
@@ -15,7 +16,27 @@ const PinDetails = ({ user }) => {
     const [commenting, setCommenting] = useState(false);
     const { pinId } = useParams();
 
-
+    const addComment = () => {
+        if (comment) {
+            setCommenting(true);
+            client.patch(pinId)
+                .setIfMissing({ 'comments': [] })
+                .insert('after', 'comments[-1]', [{
+                    comment,
+                    _key: uuidv4(),
+                    postedBy: {
+                        _type: 'postedBy',
+                        _ref: user._id
+                    }
+                }])
+                .commit()
+                .then(() => {
+                    fetchPinDetails();
+                    setComment('');
+                    setCommenting(false);
+                })
+        }
+    }
 
     const fetchPinDetails = () => {
         let query = pinDetailQuery(pinId);
@@ -35,10 +56,11 @@ const PinDetails = ({ user }) => {
 
     useEffect(() => {
         fetchPinDetails();
-    }, [pinId,fetchPinDetails])
+    }, [pinId])
 
     if (!pinDetail) return <Spinner message="Loading pin" />
     return (
+        <>        
         <div
             className='flex xl:flex-row flex-col m-auto bg-white '
             style={{ maxWidth: '1500px', borderRadius: '32px' }}
@@ -101,7 +123,7 @@ const PinDetails = ({ user }) => {
                 <div className='max-h-370 overflow-y-auto'>
                     {pinDetail?.comments?.map((comment, i) => (
                         <div className='flex gap-2 mt-5 items-center bg-white rounded-lg' key={i}>
-                            <img src={comment.postedBy.image} alt="user-profile" className='w-10 h-10 rounded-full cursor-pointer'/>
+                            <img src={comment.postedBy.image} alt="user-profile" className='w-10 h-10 rounded-full cursor-pointer' />
                             <div className='flex flex-col'>
                                 <p className='font-bold'>
                                     {comment.postedBy.userName}
@@ -113,8 +135,44 @@ const PinDetails = ({ user }) => {
                         </div>
                     ))}
                 </div>
+                <div className='flex flex-wrap mt-6 gap-3 justify-center items-center'>
+                    <Link to={`user-profile/${pinDetail.postedBy?._id}`}
+                    >
+                        <img
+                            src={pinDetail.postedBy?.image} alt="user-profile"
+                            className='h-10 w-10 rounded-full cursor-pointer'
+                        />
+                    </Link>
+                    <input
+                        type="text"
+                        className='flex-1 border-gray-100 outline-none border-2 p-2 rounded-2xl focus:border-gray-300'
+                        placeholder='Add your comment'
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+
+                    />
+                    <button
+                        type='button'
+                        className='bg-red-500 text-white rounded-full px-6 py-2 font-semibold outline-none h-10'
+                        onClick={addComment}
+                    >
+                        {commenting ? <Spinner /> : <BiCommentAdd className='xl:text-xl text-base' />}
+
+                    </button>
+                </div>
             </div>
         </div>
+            {pins?.length>0 ? (
+                <>
+                    <h2 className='text-center font-bold text-2xl mt-8 mb-4'>
+                        More like this
+                    </h2>
+                    <MassionaryLayout pins={pins}/>
+                </>
+            ) : (
+                <Spinner message="Loading More pins ..." />
+            )}
+        </>
     )
 }
 
