@@ -108,7 +108,7 @@ const PinDetails = ({ user }) => {
                         {pinDetail.about}
                     </p>
                 </div>
-                <Link to={`user-profile/${pinDetail.postedBy?._id}`} className='flex gap-2 mt-5 items-center rounded-lg hover:bg-slate-50'
+                <Link to={`/user-profile/${pinDetail.postedBy?._id}`} className='flex gap-2 mt-5 items-center rounded-lg hover:bg-slate-50'
                 >
                     <img
                         src={pinDetail.postedBy?.image} alt="user-profile"
@@ -136,7 +136,7 @@ const PinDetails = ({ user }) => {
                     ))}
                 </div>
                 <div className='flex flex-wrap mt-6 gap-3 justify-center items-center'>
-                    <Link to={`user-profile/${pinDetail.postedBy?._id}`}
+                    <Link to={`/user-profile/${pinDetail.postedBy?._id}`}
                     >
                         <img
                             src={pinDetail.postedBy?.image} alt="user-profile"
