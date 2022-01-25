@@ -31,6 +31,7 @@ const Feed = () => {
     }, [categoryId])
 
     if (loading) return (<Spinner message="Adding new shares in your feed!" />);
+    if (!pins?.length) return <h2 className='flex text-bold justify-center items-center'>No pins available</h2>
     return (
         <div>
             {pins && <MassionaryLayout pins={pins} />}

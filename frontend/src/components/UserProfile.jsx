@@ -115,8 +115,8 @@ const UserProfile = () => {
                         <div className='px-2'>
                             <MassionaryLayout pins={pins} />
                         </div>
-                    ) : <div className='px-2'>
-                       No pins found
+                    ) : <div className='flex justify-center font-bold'>
+                        No pins found
                     </div>}
                 </div>
             </div>
